@@ -338,7 +338,7 @@
         const cssHeight = rect.width * 0.5;
 
         const img = new Image();
-        img.src = "https://www.pymnts.com/wp-content/uploads/2024/03/Zama.png"; // Direct URL to Zama image (no need to upload)
+        img.src = "zama-image.jpg"; // Dosya adını buraya göre güncelledim – repo kökündeyse çalışır
         img.onload = () => {
             ctx.drawImage(img, 0, 0, cssWidth, cssHeight);
             drawText();
