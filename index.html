@@ -14,7 +14,7 @@
       --secondary-color: #000000;
       --light-text: #FFFFFF;
       --dark-text: #1a1a1a;
-      --background-color: #f0f2f5;
+      --background-color: #FFD700; /* Updated to yellow as per request */
       --correct-color: #28a745;
       --incorrect-color: #dc3545;
       --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
@@ -23,8 +23,8 @@
     /* --- General Body Styles --- */
     body {
       font-family: "Poppins", sans-serif;
-      background-color: var(--background-color);
-      color: var(--dark-text);
+      background-color: var(--background-color); /* Yellow background */
+      color: var(--secondary-color); /* Black text */
       display: flex;
       justify-content: center;
       align-items: center;
@@ -36,7 +36,7 @@
 
     /* --- Main Quiz Container --- */
     .quiz-container {
-      background: var(--light-text);
+      background: var(--light-text); /* White background for container */
       width: 100%;
       max-width: 700px;
       border-radius: 20px;
@@ -52,21 +52,22 @@
       font-size: 2.5rem;
       font-weight: 700;
       margin-bottom: 10px;
-      color: var(--secondary-color);
+      color: var(--secondary-color); /* Black */
     }
     h1 span {
-      color: var(--primary-color);
+      color: var(--primary-color); /* Yellow */
       text-shadow: -1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000;
     }
     p {
       font-size: 1.1rem;
       line-height: 1.6;
+      color: var(--secondary-color); /* Black text */
     }
 
     /* --- Buttons --- */
     button {
-      background-color: var(--secondary-color);
-      color: var(--light-text);
+      background-color: var(--secondary-color); /* Black background */
+      color: var(--light-text); /* White text */
       border: none;
       padding: 15px 30px;
       font-size: 1rem;
@@ -88,8 +89,8 @@
         cursor: not-allowed;
         opacity: 0.8;
     }
-    .option-btn.correct { background-color: var(--correct-color); }
-    .option-btn.incorrect { background-color: var(--incorrect-color); }
+    .option-btn.correct { background-color: var(--correct-color); color: var(--light-text); }
+    .option-btn.incorrect { background-color: var(--incorrect-color); color: var(--light-text); }
 
 
     /* --- Quiz Section --- */
@@ -100,6 +101,7 @@
         font-size: 1.5rem;
         font-weight: 600;
         margin-bottom: 30px;
+        color: var(--secondary-color); /* Black */
     }
     .progress-bar-container {
         width: 100%;
@@ -111,7 +113,7 @@
     .progress-bar {
         height: 100%;
         width: 0%;
-        background-color: var(--primary-color);
+        background-color: var(--primary-color); /* Yellow */
         border-radius: 4px;
         transition: width 0.3s ease;
     }
@@ -127,6 +129,7 @@
     #timer-text {
       font-size: 1.2rem;
       font-weight: 600;
+      color: var(--secondary-color); /* Black */
     }
     #timer-bar-container {
       width: 60%;
@@ -333,13 +336,13 @@
         const cssHeight = rect.width * 0.5;
 
         const img = new Image();
-        img.src = "zama-bg.jpg";
+        img.src = "zama-bg.jpg"; // Use a Zama background image (replace with actual Zama image URL or file if needed)
         img.onload = () => {
             ctx.drawImage(img, 0, 0, cssWidth, cssHeight);
             drawText();
         };
         img.onerror = () => {
-            ctx.fillStyle = "#FFD700";
+            ctx.fillStyle = "#FFD700"; // Yellow fallback
             ctx.fillRect(0, 0, cssWidth, cssHeight);
             drawText();
         };
@@ -349,18 +352,18 @@
             const primaryText = `${percentage}%`;
             const secondaryText = `You answered ${score}/${questions.length} correctly`;
 
-            ctx.fillStyle = "white";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
+            ctx.fillStyle = "white"; // White text for visibility
+            ctx.textAlign = "left"; // Align left for top-left placement
+            ctx.textBaseline = "top"; // Align top
             ctx.font = `bold ${cssWidth / 8}px Poppins`;
-            ctx.strokeStyle = "black";
+            ctx.strokeStyle = "black"; // Black stroke for outline
             ctx.lineWidth = cssWidth / 100;
-            ctx.strokeText(primaryText, cssWidth / 2, cssHeight / 2.2);
-            ctx.fillText(primaryText, cssWidth / 2, cssHeight / 2.2);
+            ctx.strokeText(primaryText, 20, 20); // Position at top-left (20px padding)
+            ctx.fillText(primaryText, 20, 20);
 
             ctx.font = `600 ${cssWidth / 25}px Poppins`;
-            ctx.strokeText(secondaryText, cssWidth / 2, cssHeight / 1.5);
-            ctx.fillText(secondaryText, cssWidth / 2, cssHeight / 1.5);
+            ctx.strokeText(secondaryText, 20, cssHeight / 2); // Secondary text below, still left-aligned
+            ctx.fillText(secondaryText, 20, cssHeight / 2);
         }
     }
 
@@ -392,9 +395,6 @@
       link.click();
     }
 
-    // --- YENİ EKLENEN BUTON BAĞLAMA KODU ---
-    // Bu kod, sayfa yüklendiğinde 'startButton' id'li butonu bulur ve 'startQuiz' fonksiyonunu
-    // bu butonun tıklama olayına bağlar. Bu, en güvenilir yöntemdir.
     startButton.addEventListener('click', startQuiz);
   </script>
 </body>
