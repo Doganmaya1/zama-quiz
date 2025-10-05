@@ -207,16 +207,16 @@
 
   <script>
     const questions = [
-      { q: "What does FHE stand for?", options: ["Fully Homomorphic Encryption", "Fast Homomorphic Encryption", "Federated Homomorphic Encoding", "Fault-tolerant Hash Encryption"], correct: "Fully Homomorphic Encryption" },
-      { q: "Which company provides the core FHE libraries for confidential smart contracts?", options: ["Zama", "ZeroCorp", "CryptoChain", "Homomorphic Labs"], correct: "Zama" },
-      { q: "What is the key benefit of FHE in blockchain?", options: ["Computing on encrypted data without decrypting it", "Lowering gas fees", "Achieving faster transaction finality", "Simplifying wallet integration"], correct: "Computing on encrypted data without decrypting it" },
-      { q: "The Zama Protocol is best described as a:", options: ["Cross-chain confidentiality layer", "New Layer-1 blockchain", "Centralized cloud service", "Web browser extension"], correct: "Cross-chain confidentiality layer" },
-      { q: "Which of the following is an open-source FHE library by Zama?", options: ["tfhe-rs", "homomorph-py", "secret-chain", "zchain-sdk"], correct: "tfhe-rs" },
-      { q: "What does 'composability' mean for smart contracts?", options: ["Contracts can be combined to build new applications", "Contracts can only be read by authorized nodes", "Contracts are automatically encrypted by default", "Contracts have fixed, predictable gas rates"], correct: "Contracts can be combined to build new applications" },
-      { q: "Zama's FHE is post-quantum secure. This implies:", options: ["It's resistant to attacks by known quantum algorithms", "It requires a quantum computer for encryption", "It becomes slower after quantum advancements", "It can only run on a quantum-powered internet"], correct: "It's resistant to attacks by known quantum algorithms" },
-      { q: "Which cryptographic technique helps decentralize the global network key in Zama?", options: ["MPC (Multi-Party Computation)", "ZKP (Zero-Knowledge Proofs)", "SSO (Single Sign-On)", "PoW (Proof of Work)"], correct: "MPC (Multi-Party Computation)" },
-      { q: "What is a primary use case for confidential smart contracts?", options: ["Private DeFi and confidential token transfers", "Public mempool monitoring and analysis", "Reducing overall block size on-chain", "Accelerating the mining process"], correct: "Private DeFi and confidential token transfers" },
-      { q: "Where can developers find Zama's open-source projects?", options: ["On GitHub under the zama-ai organization", "In a private, invitation-only repository", "Exclusively within a whitepaper PDF", "On a proprietary, closed-source app store"], correct: "On GitHub under the zama-ai organization" }
+      { q: "What does FHE stand for?", options: ["Fast Homomorphic Encryption", "Federated Homomorphic Encoding", "Fully Homomorphic Encryption", "Fault-tolerant Hash Encryption"], correct: "Fully Homomorphic Encryption" },
+      { q: "Which company provides the core FHE libraries for confidential smart contracts?", options: ["CryptoChain", "ZeroCorp", "Homomorphic Labs", "Zama"], correct: "Zama" },
+      { q: "What is the key benefit of FHE in blockchain?", options: ["Achieving faster transaction finality", "Simplifying wallet integration", "Computing on encrypted data without decrypting it", "Lowering gas fees"], correct: "Computing on encrypted data without decrypting it" },
+      { q: "The Zama Protocol is best described as a:", options: ["Centralized cloud service", "Cross-chain confidentiality layer", "New Layer-1 blockchain", "Web browser extension"], correct: "Cross-chain confidentiality layer" },
+      { q: "Which of the following is an open-source FHE library by Zama?", options: ["homomorph-py", "zchain-sdk", "tfhe-rs", "secret-chain"], correct: "tfhe-rs" },
+      { q: "What does 'composability' mean for smart contracts?", options: ["Contracts can only be read by authorized nodes", "Contracts have fixed, predictable gas rates", "Contracts are automatically encrypted by default", "Contracts can be combined to build new applications"], correct: "Contracts can be combined to build new applications" },
+      { q: "Zama's FHE is post-quantum secure. This implies:", options: ["It requires a quantum computer for encryption", "It's resistant to attacks by known quantum algorithms", "It becomes slower after quantum advancements", "It can only run on a quantum-powered internet"], correct: "It's resistant to attacks by known quantum algorithms" },
+      { q: "Which cryptographic technique helps decentralize the global network key in Zama?", options: ["SSO (Single Sign-On)", "ZKP (Zero-Knowledge Proofs)", "MPC (Multi-Party Computation)", "PoW (Proof of Work)"], correct: "MPC (Multi-Party Computation)" },
+      { q: "What is a primary use case for confidential smart contracts?", options: ["Reducing overall block size on-chain", "Public mempool monitoring and analysis", "Accelerating the mining process", "Private DeFi and confidential token transfers"], correct: "Private DeFi and confidential token transfers" },
+      { q: "Where can developers find Zama's open-source projects?", options: ["On GitHub under the zama-ai organization", "In a private, invitation-only repository", "On a proprietary, closed-source app store", "Exclusively within a whitepaper PDF"], correct: "On GitHub under the zama-ai organization" }
     ];
 
     let currentQuestionIndex = 0;
@@ -252,9 +252,10 @@
       const optionsContainer = document.getElementById("optionsContainer");
       optionsContainer.innerHTML = "";
       
-      q.options.forEach(option => {
+      const labels = ['A- ', 'B- ', 'C- ', 'D- '];
+      q.options.forEach((option, index) => {
         const btn = document.createElement("button");
-        btn.textContent = option;
+        btn.textContent = labels[index] + option;
         btn.classList.add("option-btn");
         btn.onclick = () => selectAnswer(btn, option, q.correct);
         optionsContainer.appendChild(btn);
@@ -283,7 +284,8 @@
           clearInterval(timer);
           document.querySelectorAll('.option-btn').forEach(btn => {
               btn.disabled = true;
-              if(btn.textContent === questions[currentQuestionIndex].correct) {
+              const optionText = btn.textContent.slice(3); // Remove A- etc.
+              if(optionText === questions[currentQuestionIndex].correct) {
                   btn.classList.add('correct');
               }
           });
@@ -302,7 +304,8 @@
       } else {
         button.classList.add("incorrect");
         document.querySelectorAll('.option-btn').forEach(btn => {
-          if (btn.textContent === correct) {
+          const optionText = btn.textContent.slice(3); // Remove A- etc.
+          if (optionText === correct) {
             btn.classList.add("correct");
           }
         });
@@ -336,7 +339,7 @@
         const cssHeight = rect.width * 0.5;
 
         const img = new Image();
-        img.src = "zama-bg.jpg"; // Use a Zama background image (replace with actual Zama image URL or file if needed)
+        img.src = "zama-bg.jpg"; // Use a Zama-related background image (upload your own Zama image to GitHub repo and reference it here)
         img.onload = () => {
             ctx.drawImage(img, 0, 0, cssWidth, cssHeight);
             drawText();
