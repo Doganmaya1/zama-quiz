@@ -6,79 +6,69 @@
   <title>Zama Quiz — 10 Questions</title>
   <style>
     body {
-      font-family: "Poppins", Arial, sans-serif;
-      background-color: #ffcc00; /* Zama Yellow */
-      color: #000000; /* Black text */
+      font-family: "Arial", sans-serif;
+      background-color: #FFD700; /* Zama yellow */
+      color: #000;
       text-align: center;
       margin: 0;
       padding: 0;
     }
     h1 {
-      color: #000000;
+      color: #000;
+      margin-top: 30px;
       font-weight: 800;
-      margin-top: 40px;
-    }
-    #intro, #quiz, #result {
-      margin-top: 40px;
     }
     #quiz, #result {
       display: none;
+      margin-top: 40px;
     }
-    p {
-      font-size: 18px;
-      font-weight: 500;
+    .question {
+      display: none;
+      font-size: 20px;
+      margin: 20px;
+      font-weight: bold;
     }
     button {
-      background-color: #000000;
-      color: #ffffff;
+      background-color: #000;
+      color: #fff;
       border: none;
-      padding: 12px 28px;
+      padding: 12px 25px;
       font-size: 16px;
       border-radius: 10px;
       cursor: pointer;
       margin: 10px;
       font-weight: bold;
-      transition: all 0.3s ease;
     }
     button:hover {
-      background-color: #ffffff;
-      color: #000000;
+      background-color: #222;
     }
     #timer {
-      font-size: 20px;
-      color: #000000;
-      font-weight: bold;
+      font-size: 22px;
+      color: #fff;
+      background: #000;
+      display: inline-block;
+      padding: 8px 18px;
+      border-radius: 20px;
       margin-bottom: 15px;
     }
-    .question {
-      font-weight: bold;
-      font-size: 20px;
-      margin: 20px auto;
-      max-width: 700px;
-      line-height: 1.4;
-    }
-    .option-btn {
-      display: block;
-      background-color: #ffffff;
-      color: #000000;
-      border: 2px solid #000;
-      border-radius: 10px;
-      margin: 10px auto;
-      padding: 12px;
-      font-size: 18px;
-      font-weight: 600;
-      width: 60%;
-      text-align: left;
-      transition: all 0.25s ease;
-    }
-    .option-btn:hover {
-      background-color: #000000;
-      color: #ffffff;
-    }
     canvas {
-      margin-top: 30px;
-      border-radius: 14px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      width: 90%;
+      max-width: 800px;
+      height: auto;
+      border-radius: 12px;
+      margin-top: 20px;
+    }
+    #scoreBox {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: #000;
+      color: #fff;
+      padding: 15px 25px;
+      border-radius: 12px;
+      font-size: 28px;
+      font-weight: bold;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
     }
   </style>
 </head>
@@ -86,57 +76,62 @@
   <h1>Zama Quiz — 10 Questions</h1>
 
   <div id="intro">
-    <p><b>Start the quiz and challenge yourself!</b><br>
-    You have <b>15 seconds</b> for each question — you cannot go back.<br>
-    Let’s see how much you know about <b>Zama & FHE</b>.</p>
+    <p style="font-size: 16px; font-weight: bold;">
+      You can start the quiz by clicking below. You have <b>15 seconds</b> for each question — no going back!
+    </p>
     <button onclick="startQuiz()">Start Quiz</button>
   </div>
 
   <div id="quiz"></div>
 
   <div id="result">
-    <canvas id="canvas" width="800" height="600"></canvas><br>
+    <div id="scoreBox">
+      <div>Quiz Score</div>
+      <div id="score" style="font-size: 36px; font-weight: 900;"></div>
+    </div>
+    <canvas id="canvas"></canvas><br>
     <button onclick="shareImage()">Share on X</button>
-    <button onclick="shareDiscord()">Share on Discord</button>
     <button onclick="downloadImage()">Download Result</button>
   </div>
 
   <script>
     const questions = [
       { q: "1. What does FHE stand for?",
-        options: ["Fast Homomorphic Encryption", "Fully Homomorphic Encryption", "Federated Homomorphic Encoding", "Fault-tolerant Hash Encryption"],
+        options: ["Fully Homomorphic Encryption","Fast Homomorphic Encryption","Federated Homomorphic Encoding","Fault-tolerant Hash Encryption"],
         correct: "Fully Homomorphic Encryption" },
-      { q: "2. Which company provides this protocol?",
-        options: ["Zama", "ZeroCorp", "CryptoChain", "Homomorphic Labs"],
+      { q: "2. Which company/project provides the protocol you studied here?",
+        options: ["Zama","ZeroCorp","CryptoChain","Homomorphic Labs"],
         correct: "Zama" },
       { q: "3. What is the main advantage of FHE for blockchain apps?",
-        options: ["Lower gas fees", "End-to-end encrypted computation on encrypted data", "Faster transaction finality", "Easier wallet integration"],
+        options: ["End-to-end encrypted computation on encrypted data","Lower gas fees","Faster transaction finality","Easier wallet integration"],
         correct: "End-to-end encrypted computation on encrypted data" },
-      { q: "4. The Zama Protocol is described as:",
-        options: ["A new L1 blockchain", "A cross-chain confidentiality layer", "A centralized cloud service", "A browser extension"],
+      { q: "4. The Zama Protocol is mainly described as:",
+        options: ["A cross-chain confidentiality layer","A new L1 blockchain","A centralized cloud service","A browser extension"],
         correct: "A cross-chain confidentiality layer" },
       { q: "5. Which of the following is an open-source Zama project?",
-        options: ["tfhe-rs", "homomorph-py", "secret-chain", "zchain-sdk"],
+        options: ["tfhe-rs","homomorph-py","secret-chain","zchain-sdk"],
         correct: "tfhe-rs" },
-      { q: "6. What does composability mean in smart contracts?",
-        options: ["Contracts can be combined to build new apps", "Contracts can only be read by nodes", "Contracts are automatically encrypted", "Contracts have fixed gas rates"],
+      { q: "6. What does composability mean in the context of smart contracts?",
+        options: ["Contracts can be combined to build new apps","Contracts can only be read by nodes","Contracts are automatically encrypted","Contracts have fixed gas rates"],
         correct: "Contracts can be combined to build new apps" },
-      { q: "7. Zama’s FHE is post-quantum, meaning:",
-        options: ["It uses quantum computers", "No known quantum algorithm breaks it", "It is slower after quantum improvements", "It requires a quantum internet"],
-        correct: "No known quantum algorithm breaks it" },
-      { q: "8. Which component decentralizes Zama’s network key?",
-        options: ["HPU", "MPC (Multi-Party Computation)", "Relayer", "Browser wallet"],
+      { q: "7. Zama’s FHE approach claims to be post-quantum. This means:",
+        options: ["No known quantum algorithm currently breaks it","It uses quantum computers to encrypt data","It is slower after quantum improvements","It requires a quantum internet"],
+        correct: "No known quantum algorithm currently breaks it" },
+      { q: "8. Which component helps decentralize the global network key in Zama?",
+        options: ["MPC (Multi-Party Computation)","HPU","Relayer","Browser wallet"],
         correct: "MPC (Multi-Party Computation)" },
-      { q: "9. Main use case for confidential smart contracts?",
-        options: ["Public mempool monitoring", "Confidential payments and tokenization", "Reducing block size", "Faster mining"],
+      { q: "9. What is a primary use case for confidential smart contracts?",
+        options: ["Confidential payments and tokenization","Public mempool monitoring","Reducing block size","Faster mining"],
         correct: "Confidential payments and tokenization" },
-      { q: "10. Where can developers find Zama’s code?",
-        options: ["On GitHub (zama-ai)", "On a private repo", "Only a PDF", "Closed app store"],
+      { q: "10. Where can developers find Zama’s source code?",
+        options: ["On GitHub (zama-ai)","On a private repo only","On a whitepaper PDF only","On a closed app store"],
         correct: "On GitHub (zama-ai)" }
     ];
 
-    let current = 0, score = 0, timer, timeLeft = 15;
-    const LETTERS = ["A","B","C","D"];
+    let current = 0;
+    let score = 0;
+    let timer;
+    let timeLeft = 15;
 
     function startQuiz() {
       document.getElementById("intro").style.display = "none";
@@ -150,25 +145,29 @@
 
       if (current < questions.length) {
         const q = questions[current];
+        const qDiv = document.createElement("div");
+        qDiv.classList.add("question");
+
         const timerDiv = document.createElement("div");
         timerDiv.id = "timer";
         timerDiv.textContent = `Time left: ${timeLeft}s`;
+        qDiv.appendChild(timerDiv);
 
-        const qDiv = document.createElement("div");
-        qDiv.classList.add("question");
-        qDiv.textContent = q.q;
-
-        quizDiv.appendChild(timerDiv);
-        quizDiv.appendChild(qDiv);
+        const qText = document.createElement("p");
+        qText.textContent = q.q;
+        qDiv.appendChild(qText);
 
         q.options.forEach((opt, i) => {
           const btn = document.createElement("button");
-          btn.className = "option-btn";
-          btn.innerHTML = `<b>${LETTERS[i]}.</b> ${opt}`;
+          btn.textContent = `${String.fromCharCode(65 + i)} - ${opt}`;
           btn.onclick = () => answer(opt);
-          quizDiv.appendChild(btn);
+          qDiv.appendChild(btn);
+          const br = document.createElement("br");
+          qDiv.appendChild(br);
         });
 
+        quizDiv.appendChild(qDiv);
+        qDiv.style.display = "block";
         startTimer();
       } else {
         showResult();
@@ -177,11 +176,12 @@
 
     function startTimer() {
       timeLeft = 15;
+      document.getElementById("timer").textContent = `Time left: ${timeLeft}s`;
       clearInterval(timer);
       timer = setInterval(() => {
-        document.getElementById("timer").textContent = `Time left: ${timeLeft}s`;
         timeLeft--;
-        if (timeLeft < 0) {
+        document.getElementById("timer").textContent = `Time left: ${timeLeft}s`;
+        if (timeLeft <= 0) {
           clearInterval(timer);
           nextQuestion();
         }
@@ -202,72 +202,49 @@
     function showResult() {
       document.getElementById("quiz").style.display = "none";
       document.getElementById("result").style.display = "block";
-
       const percentage = Math.round((score / questions.length) * 100);
-      drawResultImage(percentage);
-    }
+      document.getElementById("score").innerText = `${percentage}%`;
 
-    function drawResultImage(percentage){
       const canvas = document.getElementById("canvas");
       const ctx = canvas.getContext("2d");
-      const w = canvas.width, h = canvas.height;
-      ctx.clearRect(0,0,w,h);
-
       const img = new Image();
       img.src = "zama-image.jpg";
-      img.onload = function(){
-        ctx.drawImage(img, 0, 0, w, h);
-        drawTopLeftScore(ctx, percentage);
+      img.onload = function () {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        ctx.font = "bold 60px Arial";
+        ctx.fillStyle = "black";
+        ctx.fillText(`${percentage}%`, 40, 100);
       };
-      img.onerror = function(){
-        const g = ctx.createLinearGradient(0,0,w,h);
-        g.addColorStop(0,"#ffffff");
-        g.addColorStop(1,"#fff8cc");
-        ctx.fillStyle = g;
-        ctx.fillRect(0,0,w,h);
-        drawTopLeftScore(ctx, percentage);
+      img.onerror = function () {
+        ctx.fillStyle = "#FFD700";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.font = "bold 60px Arial";
+        ctx.fillStyle = "black";
+        ctx.fillText(`${percentage}%`, 40, 100);
       };
     }
 
-    function drawTopLeftScore(ctx, percentage){
-      ctx.fillStyle = "rgba(255,255,255,0.9)";
-      ctx.fillRect(20, 20, 240, 120);
-      ctx.fillStyle = "#000000";
-      ctx.font = "700 20px Arial";
-      ctx.fillText("QUIZ SCORE", 40, 55);
-      ctx.font = "900 60px Arial";
-      ctx.fillText(`${percentage}%`, 40, 110);
-    }
-
-    function shareImage(){
+    function shareImage() {
       const canvas = document.getElementById("canvas");
       const percentage = Math.round((score / questions.length) * 100);
-      const text = `I scored ${percentage}% on the Zama FHE Quiz! 🔐✨ #ZamaCreatorProgram`;
+      const shareText = `I scored ${percentage}% on the Zama FHE Quiz! 🔐✨ #ZamaCreatorProgram`;
 
-      canvas.toBlob(blob => {
-        const file = new File([blob], "zama-quiz.png", { type: "image/png" });
+      canvas.toBlob(function (blob) {
+        const file = new File([blob], "zama-quiz-result.png", { type: "image/png" });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           navigator.share({
             title: "Zama Quiz Result",
-            text: text,
+            text: shareText,
             files: [file]
-          }).catch(() => downloadImage());
+          }).catch(err => console.log("Share failed", err));
         } else {
           downloadImage();
-          alert("Your browser doesn't support direct sharing. Image downloaded — you can share it manually on X or Discord.");
+          alert("Your browser does not support direct sharing. The image will be downloaded — upload it manually on X (Twitter).");
         }
-      });
+      }, "image/png");
     }
 
-    function shareDiscord(){
-      const percentage = Math.round((score / questions.length) * 100);
-      const text = `I scored ${percentage}% on the Zama FHE Quiz! 🔐✨ #ZamaCreatorProgram`;
-      navigator.clipboard.writeText(text).then(() => {
-        alert("✅ Text copied! Now open Discord and press Ctrl+V to share.");
-      });
-    }
-
-    function downloadImage(){
+    function downloadImage() {
       const canvas = document.getElementById("canvas");
       const link = document.createElement("a");
       link.download = "zama-quiz-result.png";
