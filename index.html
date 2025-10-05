@@ -1,11 +1,387 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Zama Quiz</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--accent:#6ee7b7}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Arial,Helvetica,sans-serif;background:linear-gradient(180deg,#071022 0%, #071826 100%);color:#e6eef6}
+    .wrap{max-width:920px;margin:28px auto;padding:18px}
+    header{display:flex;align-items:center;gap:12px}
+    h1{font-size:26px;margin:0}
+    .card{background:rgba(255,255,255,0.02);border-radius:12px;padding:18px;margin-top:18px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
+    .center{text-align:center}
+    button.btn{background:var(--accent);border:none;color:#012018;padding:10px 16px;border-radius:10px;font-weight:600;cursor:pointer}
+    button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:inherit;padding:8px 12px;border-radius:8px}
+
+    /* quiz UI */
+    .question-area{display:none}
+    .question-area.active{display:block}
+    .question-text{font-size:20px;margin-bottom:12px}
+    .choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+    .choice{background:rgba(255,255,255,0.03);padding:12px;border-radius:10px;cursor:pointer;border:1px solid rgba(255,255,255,0.02);text-align:left}
+    .choice.disabled{opacity:0.6;pointer-events:none}
+    .choice.correct{outline:3px solid rgba(99,255,174,0.18);background:linear-gradient(90deg,rgba(99,255,174,0.04),transparent)}
+    .choice.wrong{outline:3px solid rgba(255,110,110,0.12);background:linear-gradient(90deg,rgba(255,110,110,0.02),transparent)}
+
+    .meta{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+    .timer{font-weight:700}
+
+    /* result */
+    #resultView{display:none}
+    canvas{max-width:100%;height:auto;border-radius:8px;display:block;margin:12px auto}
+
+    .small{font-size:13px;color:rgba(230,238,246,0.7)}
+
+    @media(max-width:560px){h1{font-size:20px}.question-text{font-size:18px}}
+  </style>
 </head>
 <body>
-  <h1>Merhaba! 👋</h1>
-  <p>Bu, Zama Quiz test sayfan.</p>
+  <div class="wrap">
+    <header>
+      <img src="" alt="" style="width:44px;height:44px;border-radius:8px;display:none" />
+      <div>
+        <h1>Zama Quiz — 10 Soru</h1>
+        <div class="small">Kayıt yok, e‑posta yok — kısa linke tıkla başla. Her soruda geri dönemezsin.</div>
+      </div>
+    </header>
+
+    <div class="card center" id="startView">
+      <p style="margin:0 0 12px 0">Hazırsan başla düğmesine bas — her soru için <strong id="timeLabel">15</strong> saniyen var.</p>
+      <button class="btn" id="startBtn">Quiz'i Başlat</button>
+      <div style="margin-top:12px" class="small">Not: Sonuç sayfasında sabit Zama görseli üzerinde skorun gösterilecek; paylaşmak için mobilde paylaş butonunu kullan veya masaüstünde görseli indirip X'e yükle.</div>
+    </div>
+
+    <div class="card" id="quizView" style="display:none">
+      <div class="meta">
+        <div class="small">Soru <span id="currentQ">0</span> / <span id="totalQ">10</span></div>
+        <div class="timer">Kalan: <span id="countdown">15</span>s</div>
+      </div>
+
+      <div id="questionsContainer"></div>
+    </div>
+
+    <div class="card center" id="resultView">
+      <h2 id="resultText">Sonuç</h2>
+      <canvas id="resultCanvas" width="1200" height="630"></canvas>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px">
+        <button class="btn" id="shareBtn">Cihaz Paylaşımı (mobil)</button>
+        <button class="ghost" id="shareXBtn">X'te (metin + link)</button>
+        <button class="ghost" id="downloadBtn">Görseli İndir</button>
+        <button class="ghost" id="copyTextBtn">Tweet Metnini Kopyala</button>
+      </div>
+      <p class="small" style="margin-top:10px">X (Twitter) web intent ile otomatik görsel eklenmez; mobilde 'Cihaz Paylaşımı' ile görseli doğrudan paylaşma ihtimali yüksek. Masaüstünde görseli indirip manuel yüklemen gerekir.</p>
+      <div style="margin-top:12px">
+        <button class="ghost" id="startOverBtn">Baştan Başla</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ============ KULLANICI TARAFINDAN DEĞİŞTİRİLECEK KISIM ============
+   Aşağıdaki `questions` dizisini GitHub üzerinden index.html dosyasını düzenleyerek
+   istediğin sorularla değiştir. Her obje: {q: 'Metin', choices:['A','B','C','D'], correct: 0}
+   `timePerQuestion` değişkeni soru süresini (saniye) belirler.
+   Görsel dosya adı: 'zama-image.jpg' veya istediğin başka isim (repo'ya yükle). 
+*/
+const timePerQuestion = 15; // saniye
+const bgImageFilename = 'zama-image.jpg'; // repo'ya yükle (öneri: 1200x630 px)
+
+const questions = [
+  { q: 'What does FHE stand for?', choices:['Fast Homomorphic Encryption','Fully Homomorphic Encryption','Federated Homomorphic Encoding','Fault-tolerant Hash Encryption'], correct:1 },
+  { q: 'Which company/project provides the protocol you studied here?', choices:['Zama','ZeroCorp','CryptoChain','Homomorphic Labs'], correct:0 },
+  { q: 'What is the main advantage of FHE for blockchain apps?', choices:['Lower gas fees','End-to-end encrypted computation on encrypted data','Faster transaction finality','Easier wallet integration'], correct:1 },
+  { q: 'The Zama Protocol is mainly described as:', choices:['A new L1 blockchain','A cross-chain confidentiality layer','A centralized cloud service','A browser extension'], correct:1 },
+  { q: 'Which of the following is an open-source Zama project?', choices:['tfhe-rs','homomorph-py','secret-chain','zchain-sdk'], correct:0 },
+  { q: 'What does composability mean in the context of smart contracts?', choices:['Contracts can be combined to build new apps','Contracts can only be read by nodes','Contracts are automatically encrypted','Contracts have fixed gas rates'], correct:0 },
+  { q: 'Zama’s FHE approach claims to be post-quantum. This means:', choices:['It uses quantum computers to encrypt data','No known quantum algorithm currently breaks it','It is slower after quantum improvements','It requires a quantum internet'], correct:1 },
+  { q: 'Which component helps decentralize the global network key in Zama?', choices:['HPU','MPC (Multi-Party Computation)','Relayer','Browser wallet'], correct:1 },
+  { q: 'What is a primary use case for confidential smart contracts?', choices:['Public mempool monitoring','Confidential payments and tokenization','Reducing block size','Faster mining'], correct:1 },
+  { q: 'Where can developers find Zama’s source code?', choices:['On GitHub (zama-ai)','On a private repo only','On a whitepaper PDF only','On a closed app store'], correct:0 }
+];
+/* ============ KODUN GERİSİ (DEĞİŞTİRMEYİN) ============ */
+
+let current = 0;
+let score = 0;
+let timer = null;
+let secondsLeft = timePerQuestion;
+let finished = false;
+
+const totalQ = questions.length;
+
+// UI referansları
+const startView = document.getElementById('startView');
+const startBtn = document.getElementById('startBtn');
+const quizView = document.getElementById('quizView');
+const questionsContainer = document.getElementById('questionsContainer');
+const currentQspan = document.getElementById('currentQ');
+const totalQspan = document.getElementById('totalQ');
+const countdownSpan = document.getElementById('countdown');
+const timeLabel = document.getElementById('timeLabel');
+const resultView = document.getElementById('resultView');
+const resultText = document.getElementById('resultText');
+const resultCanvas = document.getElementById('resultCanvas');
+const shareBtn = document.getElementById('shareBtn');
+const shareXBtn = document.getElementById('shareXBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const copyTextBtn = document.getElementById('copyTextBtn');
+const startOverBtn = document.getElementById('startOverBtn');
+
+// Başlangıç
+totalQspan.textContent = totalQ;
+countdownSpan.textContent = timePerQuestion;
+timeLabel.textContent = timePerQuestion;
+
+// create question nodes dynamically
+function buildQuestions() {
+  questionsContainer.innerHTML = '';
+  questions.forEach((item, idx) => {
+    const sec = document.createElement('div');
+    sec.className = 'question-area';
+    sec.id = 'q' + idx;
+
+    const qt = document.createElement('div'); qt.className = 'question-text'; qt.textContent = item.q;
+    const choices = document.createElement('div'); choices.className = 'choices';
+
+    item.choices.forEach((ch, ci) => {
+      const btn = document.createElement('button');
+      btn.className = 'choice';
+      btn.innerHTML = `<div style="font-weight:700">${String.fromCharCode(65+ci)})</div><div style="margin-top:6px">${ch}</div>`;
+      btn.addEventListener('click', () => selectAnswer(idx, ci, btn));
+      choices.appendChild(btn);
+    });
+
+    sec.appendChild(qt);
+    sec.appendChild(choices);
+    questionsContainer.appendChild(sec);
+  });
+}
+
+// history state + popstate önlemi (basit)
+function pushStateForQuestion(qIndex){
+  try{ history.pushState({q:qIndex}, '', '#q' + qIndex); } catch(e){}
+}
+window.addEventListener('popstate', (ev)=>{
+  // kullanıcı geri tuşuna bastığında, önüne geçmeye çalış
+  if(!finished && ev.state && typeof ev.state.q === 'number'){
+    // geri dönmeye izin verme: geri gelirse tekrar ileri taşı
+    const target = ev.state.q;
+    if(target < current){
+      // zorla ileri
+      pushStateForQuestion(current);
+    }
+  }
+});
+
+// sayfadan ayrılma uyarısı quiz yaparken
+window.addEventListener('beforeunload', (e)=>{
+  if(!finished){ e.preventDefault(); e.returnValue = '';} // modern tarayıcılar stille gösterir
+});
+
+function startQuiz(){
+  startView.style.display = 'none';
+  quizView.style.display = 'block';
+  buildQuestions();
+  showQuestion(0);
+  pushStateForQuestion(0);
+}
+
+function showQuestion(idx){
+  clearInterval(timer);
+  secondsLeft = timePerQuestion;
+  countdownSpan.textContent = secondsLeft;
+
+  // hide all
+  document.querySelectorAll('.question-area').forEach(el=>el.classList.remove('active'));
+  const qEl = document.getElementById('q' + idx);
+  if(!qEl) return;
+  qEl.classList.add('active');
+  current = idx;
+  currentQspan.textContent = idx + 1;
+  pushStateForQuestion(idx);
+
+  // enable choices
+  qEl.querySelectorAll('.choice').forEach(b=>{ b.classList.remove('disabled','correct','wrong'); b.disabled = false; });
+
+  // timer
+  timer = setInterval(()=>{
+    secondsLeft--;
+    countdownSpan.textContent = secondsLeft;
+    if(secondsLeft <= 0){
+      clearInterval(timer);
+      markTimedOut(idx);
+    }
+  },1000);
+}
+
+function markTimedOut(idx){
+  // süre doldu, yanlış say (isteğe bağlı: sıfır puan veya pas) ve devam et
+  // görsel geribildirim ekleyebiliriz
+  const qEl = document.getElementById('q' + idx);
+  qEl.querySelectorAll('.choice').forEach(b=>{ b.classList.add('disabled'); b.disabled = true; });
+  // küçük bekleme sonra devam
+  setTimeout(()=>nextQuestion(), 600);
+}
+
+function selectAnswer(qIdx, choiceIdx, btn){
+  clearInterval(timer);
+  const qObj = questions[qIdx];
+  const qEl = document.getElementById('q' + qIdx);
+  // disable all
+  qEl.querySelectorAll('.choice').forEach(b=>{ b.classList.add('disabled'); b.disabled = true; });
+
+  const allBtns = Array.from(qEl.querySelectorAll('.choice'));
+  const correctIdx = qObj.correct;
+  if(choiceIdx === correctIdx){
+    score++;
+    btn.classList.add('correct');
+  } else {
+    btn.classList.add('wrong');
+    // highlight correct
+    if(allBtns[correctIdx]) allBtns[correctIdx].classList.add('correct');
+  }
+
+  // küçük gecikme ile sonraki soruya geç
+  setTimeout(()=>nextQuestion(), 700);
+}
+
+function nextQuestion(){
+  if(current + 1 < totalQ){
+    showQuestion(current + 1);
+  } else {
+    finishQuiz();
+  }
+}
+
+function finishQuiz(){
+  finished = true;
+  clearInterval(timer);
+  quizView.style.display = 'none';
+  resultView.style.display = 'block';
+  // sonuç hesapla
+  const percent = Math.round((score / totalQ) * 100);
+  resultText.textContent = `Doğruluk: ${percent}% — ${score}/${totalQ} doğru`;
+  // canvas üzerinde görsel + yüzde göster
+  drawResultCanvas(percent);
+}
+
+function drawResultCanvas(percent){
+  const canvas = resultCanvas;
+  const ctx = canvas.getContext('2d');
+  // temizle
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const img = new Image();
+  img.src = bgImageFilename; // must be uploaded to repo root
+  img.onload = function(){
+    // draw base image full
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    // draw semi transparent overlay at bottom for text
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.fillRect(0, canvas.height - 110, canvas.width, 110);
+
+    // draw percentage big
+    ctx.font = 'bold 72px Inter, Arial';
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#fff';
+    ctx.fillText(`${percent}%`, 40, canvas.height - 30);
+
+    // draw small details
+    ctx.font = '18px Inter, Arial';
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.fillText(`${score} / ${totalQ} doğru • Zama OG NFT`, 40, canvas.height - 60);
+
+    // draw circular progress on right
+    const cx = canvas.width - 120;
+    const cy = canvas.height - 55;
+    const r = 46;
+    // background circle
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    ctx.fill();
+    // progress arc
+    const start = -Math.PI/2;
+    const end = start + (Math.PI*2) * (percent/100);
+    ctx.beginPath();
+    ctx.lineWidth = 10;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#6ee7b7';
+    ctx.arc(cx, cy, r, start, end);
+    ctx.stroke();
+    // inner text
+    ctx.font = 'bold 20px Inter, Arial';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#fff';
+    ctx.fillText(`${percent}%`, cx, cy+8);
+  };
+  img.onerror = function(){
+    // hata: görsel yoksa sadece basit teks
+    ctx.fillStyle = '#111'; ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.font = 'bold 48px Arial'; ctx.fillStyle = '#fff'; ctx.fillText(`${percent}% — ${score}/${totalQ}`, 40, 120);
+  };
+}
+
+// share / download
+async function shareResult(){
+  // mobilde cihaz paylaşımı (görsel + metin) — Web Share API
+  const percent = Math.round((score / totalQ) * 100);
+  const text = `Zama Quiz: %${percent} doğruluk! ${score}/${totalQ} doğru. #ZamaOGNFT`;
+  // canvas -> blob
+  resultCanvas.toBlob(async function(blob){
+    if(!blob){ alert('Görsel oluşturulamadı.'); return; }
+    const filesArray = [new File([blob], 'zama-quiz-sonuc.png', { type: 'image/png' })];
+    if(navigator.canShare && navigator.canShare({ files: filesArray })){
+      try{
+        await navigator.share({ files: filesArray, text: text, title: 'Zama Quiz Sonucum' });
+      }catch(err){ console.error('share hata', err); alert('Paylaşım iptal edildi veya desteklenmiyor.'); }
+    } else {
+      // fallback: indir ve kullanıcıya talimat ver
+      downloadResult();
+      alert('Cihaz paylaşımı desteklenmiyor. Görsel indirildi; X'e yükleyerek paylaşabilirsin.');
+    }
+  }, 'image/png');
+}
+
+function downloadResult(){
+  const link = document.createElement('a');
+  link.download = 'zama-quiz-sonuc.png';
+  link.href = resultCanvas.toDataURL('image/png');
+  link.click();
+}
+
+function openXIntent(){
+  const percent = Math.round((score / totalQ) * 100);
+  const text = `Zama Quiz: %${percent} doğruluk! ${score}/${totalQ} doğru. #ZamaOGNFT`;
+  const pageLink = window.location.href.split('#')[0];
+  const tweet = encodeURIComponent(text + ' ' + pageLink);
+  const intent = `https://x.com/intent/tweet?text=${tweet}`;
+  window.open(intent, '_blank');
+}
+
+function copyTweetText(){
+  const percent = Math.round((score / totalQ) * 100);
+  const text = `Zama Quiz: %${percent} doğruluk! ${score}/${totalQ} doğru. #ZamaOGNFT ${window.location.href.split('#')[0]}`;
+  navigator.clipboard.writeText(text).then(()=>{ alert('Tweet metni kopyalandı.'); }).catch(()=>{ alert('Kopyalama başarısız.'); });
+}
+
+// event binding
+startBtn.addEventListener('click', startQuiz);
+shareBtn.addEventListener('click', shareResult);
+shareXBtn.addEventListener('click', openXIntent);
+downloadBtn.addEventListener('click', downloadResult);
+copyTextBtn.addEventListener('click', copyTweetText);
+startOverBtn.addEventListener('click', ()=>{ location.reload(); });
+
+// otomatik start eğer doğrudan kısa linkle gelinmişse (örnek: ?start=1)
+(function(){
+  buildQuestions();
+  const url = new URL(location.href);
+  if(url.searchParams.get('start') === '1'){
+    setTimeout(()=>startQuiz(), 300);
+  }
+})();
+</script>
 </body>
 </html>
