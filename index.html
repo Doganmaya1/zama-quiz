@@ -1,373 +1,404 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Zama Quiz — 10 Questions</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zama FHE Knowledge Quiz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --accent-yellow: #ffd700; /* main yellow */
-      --black: #000000;
-      --white: #ffffff;
-      --card-radius: 14px;
+    /* --- CSS Variables for Easy Theming --- */
+    :root {
+      --primary-color: #FFD700; /* Zama Yellow */
+      --secondary-color: #000000;
+      --light-text: #FFFFFF;
+      --dark-text: #1a1a1a;
+      --background-color: #f0f2f5;
+      --correct-color: #28a745;
+      --incorrect-color: #dc3545;
+      --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     }
 
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; padding:36px 18px;
-      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
-      background: var(--accent-yellow); /* page background requested to be yellow */
-      color: var(--black); /* primary text black */
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      text-align:center;
+    /* --- General Body Styles --- */
+    body {
+      font-family: "Poppins", sans-serif;
+      background-color: var(--background-color);
+      color: var(--dark-text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
     }
 
-    h1{margin:6px 0 12px;font-size:28px;color:var(--black);font-weight:800}
+    /* --- Main Quiz Container --- */
+    .quiz-container {
+      background: var(--light-text);
+      width: 100%;
+      max-width: 700px;
+      border-radius: 20px;
+      box-shadow: var(--card-shadow);
+      padding: 40px;
+      text-align: center;
+      overflow: hidden;
+      position: relative;
+    }
 
-    /* Intro */
-    #intro{max-width:880px;margin:0 auto;background:var(--white);padding:20px;border-radius:var(--card-radius);box-shadow:0 10px 30px rgba(0,0,0,0.12)}
-    #intro p{margin:6px 0;color:var(--black);font-size:16px;font-weight:700}
-    .start-btn{background:var(--accent-yellow);color:var(--black);border:none;padding:12px 20px;border-radius:10px;font-weight:800;cursor:pointer;font-size:15px}
-    .start-btn:hover{opacity:0.95}
+    /* --- Typography --- */
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--secondary-color);
+    }
+    h1 span {
+      color: var(--primary-color);
+      text-shadow: -1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000;
+    }
+    p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
 
-    /* Quiz area */
-    #quiz{display:none;max-width:920px;margin:26px auto;padding:18px;border-radius:var(--card-radius);background:var(--white);color:var(--black);box-shadow:0 12px 36px rgba(0,0,0,0.12);text-align:left}
+    /* --- Buttons --- */
+    button {
+      background-color: var(--secondary-color);
+      color: var(--light-text);
+      border: none;
+      padding: 15px 30px;
+      font-size: 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 10px 5px;
+      font-weight: 600;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+      display: inline-block;
+      width: 80%;
+      max-width: 400px;
+      text-align: left;
+    }
+    button:hover:not(:disabled) {
+      transform: translateY(-3px);
+      background-color: #333;
+    }
+    button:disabled {
+        cursor: not-allowed;
+        opacity: 0.8;
+    }
+    .option-btn.correct { background-color: var(--correct-color); }
+    .option-btn.incorrect { background-color: var(--incorrect-color); }
 
-    .meta-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 
-    /* timer: use yellow and black */
-    .timer-badge{display:inline-flex;align-items:center;gap:10px;padding:8px 12px;border-radius:999px;background:var(--accent-yellow);color:var(--black);font-weight:900;font-size:16px;border:2px solid rgba(0,0,0,0.06)}
-    .timer-bar-outer{width:280px;background:rgba(0,0,0,0.04);height:12px;border-radius:999px;overflow:hidden;border:1px solid rgba(0,0,0,0.04)}
-    .timer-bar-inner{height:100%;width:100%;background:linear-gradient(90deg,var(--black), rgba(0,0,0,0.6));transition:width 0.2s linear}
+    /* --- Quiz Section --- */
+    .question-header {
+        margin-bottom: 25px;
+    }
+    .question-text {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 30px;
+    }
+    .progress-bar-container {
+        width: 100%;
+        height: 8px;
+        background-color: #e0e0e0;
+        border-radius: 4px;
+        margin-bottom: 20px;
+    }
+    .progress-bar {
+        height: 100%;
+        width: 0%;
+        background-color: var(--primary-color);
+        border-radius: 4px;
+        transition: width 0.3s ease;
+    }
 
-    .question-box{padding:6px}
-    .qnum{color:rgba(0,0,0,0.65);font-weight:800;margin-bottom:6px}
-    .qtext{font-size:20px;margin:0 0 18px;color:var(--black);font-weight:800} /* bold questions */
+    /* --- Timer --- */
+    #timer-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+    #timer-text {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+    #timer-bar-container {
+      width: 60%;
+      height: 10px;
+      background-color: #e0e0e0;
+      border-radius: 5px;
+    }
+    #timer-bar {
+      height: 100%;
+      width: 100%;
+      background-color: var(--correct-color);
+      border-radius: 5px;
+      transition: width 1s linear;
+    }
 
-    .options{display:flex;flex-direction:column;gap:12px}
-    .option-btn{display:flex;align-items:center;gap:14px;background:transparent;color:var(--black);border:2px solid rgba(0,0,0,0.08);padding:12px;border-radius:12px;text-align:left;font-weight:800;cursor:pointer;font-size:15px}
-    .option-btn .letter{min-width:44px;height:44px;border-radius:50%;background:var(--accent-yellow);color:var(--black);display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;border:2px solid rgba(0,0,0,0.06)}
-    .option-btn .label{font-weight:800}
-    .option-btn:hover{background:rgba(0,0,0,0.03)}
-    .option-btn[disabled]{opacity:0.6;cursor:not-allowed}
+    /* --- Sections Display Logic --- */
+    #quiz, #result { display: none; }
 
-    /* Result area - minimal: show canvas centered (canvas will draw top-left score card) */
-    #result{display:none;margin-top:20px;text-align:center}
-    canvas{border-radius:12px;display:block;margin:12px auto;border:0}
-    .actions{display:flex;gap:12px;justify-content:center;margin-top:10px}
-    .action-btn{background:var(--black);color:var(--accent-yellow);border:none;padding:10px 14px;border-radius:10px;font-weight:800;cursor:pointer}
-    .discord-btn{background:#5865F2; color: #fff; border:none; padding:10px 14px;border-radius:10px;font-weight:800;cursor:pointer}
+    /* --- Result Canvas --- */
+    canvas {
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      margin-top: 20px;
+      display: block;
+    }
 
-    @media (max-width:640px){
-      .timer-bar-outer{width:140px}
-      .qtext{font-size:18px}
-      .option-btn{font-size:15px}
-      .option-btn .letter{min-width:38px;height:38px}
-      .actions{flex-wrap:wrap}
+    /* --- Responsive Design --- */
+    @media (max-width: 600px) {
+        body { padding: 10px; }
+        .quiz-container { padding: 20px; }
+        h1 { font-size: 2rem; }
+        .question-text { font-size: 1.2rem; }
+        button { width: 100%; padding: 15px; }
     }
   </style>
 </head>
 <body>
-  <h1>Zama Quiz — 10 Questions</h1>
 
-  <div id="intro">
-    <!-- Short intro in English -->
-    <p>Start by tapping "Start" — you have <strong>15 seconds</strong> for each question.</p>
-    <div style="margin-top:12px"><button id="startBtn" class="start-btn">Start</button></div>
-  </div>
+  <div class="quiz-container">
+    <div id="intro">
+      <h1>Zama <span>FHE</span> Quiz</h1>
+      <p>
+        Ready to challenge your knowledge of Fully Homomorphic Encryption?
+        You'll face 10 questions, with just <b>15 seconds</b> for each.
+        Prove your expertise and claim your spot among the privacy pioneers!
+      </p>
+      <button onclick="startQuiz()">Start the Challenge</button>
+    </div>
 
-  <div id="quiz" aria-live="polite">
-    <div class="meta-row">
-      <div id="progressText" style="font-weight:900;color:rgba(0,0,0,0.9)">Question 1 / 10</div>
-      <div style="display:flex;align-items:center;gap:12px">
-        <div class="timer-badge" id="timerBadge"><span id="timerText">15s</span></div>
-        <div class="timer-bar-outer" aria-hidden="true"><div class="timer-bar-inner" id="timerBar" style="width:100%"></div></div>
+    <div id="quiz">
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar"></div>
       </div>
+      <div class="question-header">
+        <p>Question <span id="currentQuestion"></span> of <span id="totalQuestions"></span></p>
+        <div id="timer-container">
+            <div id="timer-text">Time: 15s</div>
+            <div id="timer-bar-container">
+                <div id="timer-bar"></div>
+            </div>
+        </div>
+      </div>
+      <p class="question-text" id="questionText"></p>
+      <div id="optionsContainer"></div>
     </div>
 
-    <div class="question-box">
-      <div class="qnum" id="qNum">Question 1</div>
-      <p class="qtext" id="qText">Loading question…</p>
-      <div class="options" id="options"></div>
-    </div>
-  </div>
-
-  <div id="result">
-    <canvas id="resultCanvas" width="820" height="460" aria-label="Quiz result image"></canvas>
-    <div class="actions">
-      <button class="action-btn" id="shareBtn">Share on X</button>
-      <button class="discord-btn" id="discordWebhookBtn">Share to Discord (Webhook)</button>
-      <button class="action-btn" id="copyOpenDiscordBtn">Copy & Open Discord</button>
-      <button class="action-btn" id="downloadBtn">Download</button>
+    <div id="result">
+      <h1>Quiz Complete!</h1>
+      <p>Here is your final score. Share it with the world!</p>
+      <canvas id="canvas"></canvas><br>
+      <button onclick="shareImage()">Share on X</button>
+      <button onclick="downloadImage()">Download Result</button>
     </div>
   </div>
 
   <script>
-    // Questions
     const questions = [
-      { q: "What does FHE stand for?", options: ["Fast Homomorphic Encryption","Fully Homomorphic Encryption","Federated Homomorphic Encoding","Fault-tolerant Hash Encryption"], correct: "Fully Homomorphic Encryption"},
-      { q: "Which company/project provides the protocol you studied here?", options: ["Zama","ZeroCorp","CryptoChain","Homomorphic Labs"], correct: "Zama"},
-      { q: "What is the main advantage of FHE for blockchain apps?", options: ["Lower gas fees","End-to-end encrypted computation on encrypted data","Faster transaction finality","Easier wallet integration"], correct: "End-to-end encrypted computation on encrypted data"},
-      { q: "The Zama Protocol is mainly described as:", options: ["A new L1 blockchain","A cross-chain confidentiality layer","A centralized cloud service","A browser extension"], correct: "A cross-chain confidentiality layer"},
-      { q: "Which of the following is an open-source Zama project?", options: ["tfhe-rs","homomorph-py","secret-chain","zchain-sdk"], correct: "tfhe-rs"},
-      { q: "What does composability mean in the context of smart contracts?", options: ["Contracts can be combined to build new apps","Contracts can only be read by nodes","Contracts are automatically encrypted","Contracts have fixed gas rates"], correct: "Contracts can be combined to build new apps"},
-      { q: "Zama’s FHE approach claims to be post-quantum. This means:", options: ["It uses quantum computers to encrypt data","No known quantum algorithm currently breaks it","It is slower after quantum improvements","It requires a quantum internet"], correct: "No known quantum algorithm currently breaks it"},
-      { q: "Which component helps decentralize the global network key in Zama?", options: ["HPU","MPC (Multi-Party Computation)","Relayer","Browser wallet"], correct: "MPC (Multi-Party Computation)"},
-      { q: "What is a primary use case for confidential smart contracts?", options: ["Public mempool monitoring","Confidential payments and tokenization","Reducing block size","Faster mining"], correct: "Confidential payments and tokenization"},
-      { q: "Where can developers find Zama’s source code?", options: ["On GitHub (zama-ai)","On a private repo only","On a whitepaper PDF only","On a closed app store"], correct: "On GitHub (zama-ai)"}
+      { q: "What does FHE stand for?", options: ["Fully Homomorphic Encryption", "Fast Homomorphic Encryption", "Federated Homomorphic Encoding", "Fault-tolerant Hash Encryption"], correct: "Fully Homomorphic Encryption" },
+      { q: "Which company provides the core FHE libraries for confidential smart contracts?", options: ["Zama", "ZeroCorp", "CryptoChain", "Homomorphic Labs"], correct: "Zama" },
+      { q: "What is the key benefit of FHE in blockchain?", options: ["Computing on encrypted data without decrypting it", "Lowering gas fees", "Achieving faster transaction finality", "Simplifying wallet integration"], correct: "Computing on encrypted data without decrypting it" },
+      { q: "The Zama Protocol is best described as a:", options: ["Cross-chain confidentiality layer", "New Layer-1 blockchain", "Centralized cloud service", "Web browser extension"], correct: "Cross-chain confidentiality layer" },
+      { q: "Which of the following is an open-source FHE library by Zama?", options: ["tfhe-rs", "homomorph-py", "secret-chain", "zchain-sdk"], correct: "tfhe-rs" },
+      { q: "What does 'composability' mean for smart contracts?", options: ["Contracts can be combined to build new applications", "Contracts can only be read by authorized nodes", "Contracts are automatically encrypted by default", "Contracts have fixed, predictable gas rates"], correct: "Contracts can be combined to build new applications" },
+      { q: "Zama's FHE is post-quantum secure. This implies:", options: ["It's resistant to attacks by known quantum algorithms", "It requires a quantum computer for encryption", "It becomes slower after quantum advancements", "It can only run on a quantum-powered internet"], correct: "It's resistant to attacks by known quantum algorithms" },
+      { q: "Which cryptographic technique helps decentralize the global network key in Zama?", options: ["MPC (Multi-Party Computation)", "ZKP (Zero-Knowledge Proofs)", "SSO (Single Sign-On)", "PoW (Proof of Work)"], correct: "MPC (Multi-Party Computation)" },
+      { q: "What is a primary use case for confidential smart contracts?", options: ["Private DeFi and confidential token transfers", "Public mempool monitoring and analysis", "Reducing overall block size on-chain", "Accelerating the mining process"], correct: "Private DeFi and confidential token transfers" },
+      { q: "Where can developers find Zama's open-source projects?", options: ["On GitHub under the zama-ai organization", "In a private, invitation-only repository", "Exclusively within a whitepaper PDF", "On a proprietary, closed-source app store"], correct: "On GitHub under the zama-ai organization" }
     ];
 
-    const LETTERS = ['A','B','C','D'];
-    const QUESTION_TIME = 15;
-    let current = 0; let score = 0; let timer = null; let timeLeft = QUESTION_TIME;
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timer;
+    let timeLeft = 15;
 
-    // DOM
-    const startBtn = document.getElementById('startBtn');
-    const quizDiv = document.getElementById('quiz');
-    const resultDiv = document.getElementById('result');
-    const qNumEl = document.getElementById('qNum');
-    const qTextEl = document.getElementById('qText');
-    const optionsEl = document.getElementById('options');
-    const timerText = document.getElementById('timerText');
-    const timerBar = document.getElementById('timerBar');
-    const progressText = document.getElementById('progressText');
-    const shareBtn = document.getElementById('shareBtn');
-    const discordWebhookBtn = document.getElementById('discordWebhookBtn');
-    const copyOpenDiscordBtn = document.getElementById('copyOpenDiscordBtn');
-    const downloadBtn = document.getElementById('downloadBtn');
+    const introDiv = document.getElementById("intro");
+    const quizDiv = document.getElementById("quiz");
+    const resultDiv = document.getElementById("result");
 
-    startBtn.addEventListener('click', startQuiz);
-    shareBtn.addEventListener('click', shareImage);
-    discordWebhookBtn.addEventListener('click', shareToDiscordWebhookPrompt);
-    copyOpenDiscordBtn.addEventListener('click', copyAndOpenDiscord);
-    downloadBtn.addEventListener('click', downloadImage);
-
-    function startQuiz(){
-      current = 0; score = 0;
-      document.getElementById('intro').style.display = 'none';
-      resultDiv.style.display = 'none';
-      quizDiv.style.display = 'block';
+    function startQuiz() {
+      introDiv.style.display = "none";
+      quizDiv.style.display = "block";
+      document.getElementById("totalQuestions").textContent = questions.length;
       showQuestion();
     }
 
-    function showQuestion(){
-      const q = questions[current];
-      progressText.textContent = `Question ${current+1} / ${questions.length}`;
-      qNumEl.textContent = `Question ${current+1}`;
-      qTextEl.textContent = q.q;
+    function showQuestion() {
+      if (currentQuestionIndex >= questions.length) {
+        showResult();
+        return;
+      }
+      
+      resetQuestionUI();
+      const q = questions[currentQuestionIndex];
 
-      optionsEl.innerHTML = '';
-      q.options.forEach((opt,i) => {
-        const btn = document.createElement('button');
-        btn.className = 'option-btn';
-        btn.type = 'button';
-        btn.dataset.index = i;
-        // show single letter circle and option text (no duplicate letter)
-        btn.innerHTML = `<span class="letter">${LETTERS[i]}</span><span class="label"> - ${opt}</span>`;
-        btn.addEventListener('click', () => answer(i));
-        optionsEl.appendChild(btn);
+      document.getElementById("currentQuestion").textContent = currentQuestionIndex + 1;
+      document.getElementById("questionText").textContent = q.q;
+      document.getElementById("progressBar").style.width = `${((currentQuestionIndex) / questions.length) * 100}%`;
+      
+      const optionsContainer = document.getElementById("optionsContainer");
+      optionsContainer.innerHTML = "";
+      
+      q.options.forEach(option => {
+        const btn = document.createElement("button");
+        btn.textContent = option;
+        btn.classList.add("option-btn");
+        btn.onclick = () => selectAnswer(btn, option, q.correct);
+        optionsContainer.appendChild(btn);
       });
 
       startTimer();
     }
+    
+    function resetQuestionUI() {
+        clearInterval(timer);
+        timeLeft = 15;
+        document.getElementById("timer-text").textContent = `Time: ${timeLeft}s`;
+        const timerBar = document.getElementById("timer-bar");
+        timerBar.style.transition = 'none'; // reset transition for instant change
+        timerBar.style.width = '100%';
+        // force reflow to apply the change immediately
+        void timerBar.offsetWidth; 
+        timerBar.style.transition = 'width 1s linear';
+    }
 
-    function startTimer(){
-      clearInterval(timer);
-      timeLeft = QUESTION_TIME;
-      updateTimerUI();
+    function startTimer() {
       timer = setInterval(() => {
-        timeLeft -= 1;
-        if (timeLeft <= 0){
+        timeLeft--;
+        document.getElementById("timer-text").textContent = `Time: ${timeLeft}s`;
+        document.getElementById("timer-bar").style.width = `${(timeLeft / 15) * 100}%`;
+        if (timeLeft <= 0) {
           clearInterval(timer);
-          disableOptions();
-          setTimeout(() => nextQuestion(), 180);
-        } else {
-          updateTimerUI();
+          // Mark all as incorrect and move on
+          document.querySelectorAll('.option-btn').forEach(btn => {
+              btn.disabled = true;
+              if(btn.textContent === questions[currentQuestionIndex].correct) {
+                  btn.classList.add('correct');
+              }
+          });
+          setTimeout(nextQuestion, 1500);
         }
       }, 1000);
     }
 
-    function updateTimerUI(){
-      timerText.textContent = `${timeLeft}s`;
-      const pct = Math.max(0,(timeLeft/QUESTION_TIME)*100);
-      timerBar.style.width = `${pct}%`;
+    function selectAnswer(button, selected, correct) {
+      clearInterval(timer);
+      document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
+
+      if (selected === correct) {
+        score++;
+        button.classList.add("correct");
+      } else {
+        button.classList.add("incorrect");
+        // Also show the correct answer
+        document.querySelectorAll('.option-btn').forEach(btn => {
+          if (btn.textContent === correct) {
+            btn.classList.add("correct");
+          }
+        });
+      }
+      setTimeout(nextQuestion, 1500); // Wait 1.5s before next question
     }
 
-    function disableOptions(){
-      const buttons = optionsEl.querySelectorAll('button');
-      buttons.forEach(b => b.disabled = true);
+    function nextQuestion() {
+      currentQuestionIndex++;
+      showQuestion();
     }
 
-    function answer(index){
-      disableOptions(); clearInterval(timer);
-      const selected = questions[current].options[index];
-      const correct = questions[current].correct;
+    function showResult() {
+      quizDiv.style.display = "none";
+      resultDiv.style.display = "block";
+      drawResultCanvas();
+      // Add a resize observer to redraw canvas if window size changes
+      new ResizeObserver(drawResultCanvas).observe(document.getElementById('canvas'));
+    }
+    
+    function drawResultCanvas() {
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
 
-      const buttons = optionsEl.querySelectorAll('button');
-      buttons.forEach(btn => {
-        const i = Number(btn.dataset.index);
-        if (questions[current].options[i] === correct){
-          btn.style.border = '2px solid rgba(0,0,0,0.16)';
-          btn.style.boxShadow = '0 8px 20px rgba(0,0,0,0.06)';
-        } else if (i === index && questions[current].options[i] !== correct){
-          btn.style.opacity = '0.6';
+        // Set canvas internal size
+        canvas.width = rect.width * dpr;
+        canvas.height = (rect.width * 0.5) * dpr; // Use a 2:1 aspect ratio
+        ctx.scale(dpr, dpr);
+        
+        const cssWidth = rect.width;
+        const cssHeight = rect.width * 0.5;
+
+        // Draw background image or fallback color
+        const img = new Image();
+        img.src = "zama-bg.jpg"; // USE YOUR BACKGROUND IMAGE HERE
+        img.onload = () => {
+            ctx.drawImage(img, 0, 0, cssWidth, cssHeight);
+            drawText();
+        };
+        img.onerror = () => {
+            ctx.fillStyle = "#FFD700"; // Zama yellow fallback
+            ctx.fillRect(0, 0, cssWidth, cssHeight);
+            drawText();
+        };
+
+        function drawText() {
+            const percentage = Math.round((score / questions.length) * 100);
+            const primaryText = `${percentage}%`;
+            const secondaryText = `You answered ${score}/${questions.length} correctly`;
+
+            // Style and draw primary text (percentage)
+            ctx.fillStyle = "white";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.font = `bold ${cssWidth / 8}px Poppins`;
+            ctx.strokeStyle = "black";
+            ctx.lineWidth = cssWidth / 100;
+            ctx.strokeText(primaryText, cssWidth / 2, cssHeight / 2.2);
+            ctx.fillText(primaryText, cssWidth / 2, cssHeight / 2.2);
+
+            // Style and draw secondary text
+            ctx.font = `600 ${cssWidth / 25}px Poppins`;
+            ctx.strokeText(secondaryText, cssWidth / 2, cssHeight / 1.5);
+            ctx.fillText(secondaryText, cssWidth / 2, cssHeight / 1.5);
         }
-      });
-
-      if (selected === correct) score++;
-      setTimeout(() => nextQuestion(), 300);
     }
 
-    function nextQuestion(){
-      current++;
-      if (current >= questions.length) showResult();
-      else showQuestion();
-    }
+    function shareImage() {
+      const canvas = document.getElementById("canvas");
+      const percentage = Math.round((score / questions.length) * 100);
+      const shareText = `I scored ${percentage}% on the Zama FHE Quiz! Think you can do better? #Zama #FHE #Cryptography`;
 
-    /* Result drawing: top-left card only with 'QUIZ SCORE' and percentage below */
-    function showResult(){
-      quizDiv.style.display = 'none';
-      resultDiv.style.display = 'block';
-      const percentage = Math.round((score/questions.length)*100);
-      drawResultImage(percentage);
-    }
-
-    function drawResultImage(percentage){
-      const canvas = document.getElementById('resultCanvas');
-      const ctx = canvas.getContext('2d');
-      const w = canvas.width; const h = canvas.height;
-      ctx.clearRect(0,0,w,h);
-
-      // soft background
-      const g = ctx.createLinearGradient(0,0,w,h);
-      g.addColorStop(0,'#ffffff');
-      g.addColorStop(1,'#fff9e6');
-      ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
-
-      // top-left card
-      const pad = 20; const cardW = 260; const cardH = 140; const r = 12;
-      ctx.beginPath();
-      ctx.moveTo(pad+r,pad);
-      ctx.lineTo(pad+cardW-r,pad);
-      ctx.quadraticCurveTo(pad+cardW,pad+0,pad+cardW,pad+r);
-      ctx.lineTo(pad+cardW,pad+cardH-r);
-      ctx.quadraticCurveTo(pad+cardW,pad+cardH,pad+cardW-r,pad+cardH);
-      ctx.lineTo(pad+r,pad+cardH);
-      ctx.quadraticCurveTo(pad,pad+cardH,pad,pad+cardH-r);
-      ctx.lineTo(pad,pad+r);
-      ctx.quadraticCurveTo(pad,pad,pad+r,pad);
-      ctx.closePath();
-
-      ctx.fillStyle = '#ffffff';
-      ctx.shadowColor = 'rgba(0,0,0,0.12)';
-      ctx.shadowBlur = 18; ctx.shadowOffsetY = 6;
-      ctx.fill();
-      ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
-
-      // Label: QUIZ SCORE
-      ctx.fillStyle = '#000000';
-      ctx.font = '700 18px Inter, Arial';
-      ctx.textBaseline = 'top';
-      ctx.fillText('QUIZ SCORE', pad + 18, pad + 18);
-
-      // Big percentage
-      ctx.font = '800 64px Inter, Arial';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(`${percentage}%`, pad + 18, pad + cardH/2 + 8);
-    }
-
-    // SHARE: X (Web Share) and Discord helpers
-    function shareImage(){
-      const canvas = document.getElementById('resultCanvas');
-      const percentage = Math.round((score/questions.length)*100);
-      const shareText = `I scored ${percentage}% on the Zama FHE Quiz! 🔐✨
-#ZamaCreatorProgram`;
-
-      canvas.toBlob(function(blob){
-        const file = new File([blob], 'zama-quiz-result.png', {type:'image/png'});
-        if (navigator.canShare && navigator.canShare({files:[file]})){
-          navigator.share({title:'Zama Quiz Result',text:shareText,files:[file]}).catch(err=>console.log('Share failed',err));
+      canvas.toBlob(blob => {
+        const file = new File([blob], "zama-quiz-result.png", { type: "image/png" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({
+            title: "Zama Quiz Result",
+            text: shareText,
+            files: [file]
+          }).catch(err => console.error("Share failed", err));
         } else {
+          alert("Direct sharing isn't supported by your browser. The result image will be downloaded instead.");
           downloadImage();
-          alert('Direct sharing is not supported by this browser. The image was downloaded — upload it manually to your preferred app.');
         }
-      }, 'image/png');
+      }, "image/png");
     }
 
-    // Copy share text + open Discord (mobile friendly)
-    async function copyAndOpenDiscord(){
-      const percentage = Math.round((score/questions.length)*100);
-      const shareText = `I scored ${percentage}% on the Zama FHE Quiz! 🔐✨
-#ZamaCreatorProgram`;
-      try{
-        await navigator.clipboard.writeText(shareText);
-        // try to open native discord app (works on mobile if installed)
-        const opened = window.open('discord://', '_blank');
-        // fallback to web
-        setTimeout(()=>{
-          window.open('https://discord.com/channels/@me', '_blank');
-        }, 600);
-        alert('Share text copied to clipboard. Paste it in your Discord channel and attach the downloaded image.');
-      } catch(err){
-        alert('Could not copy to clipboard automatically. Please copy this text manually:
-
-' + shareText);
-      }
-    }
-
-    // Share via Discord Webhook (user must provide webhook URL for a channel)
-    function shareToDiscordWebhookPrompt(){
-      const url = prompt('Paste the Discord channel Webhook URL (create one in channel > Integrations > Webhooks).
-
-Warning: due to browser CORS policies this may fail — if it does, use manual upload.');
-      if (!url) return;
-
-      const canvas = document.getElementById('resultCanvas');
-      canvas.toBlob(function(blob){
-        postToDiscordWebhook(url, blob);
-      }, 'image/png');
-    }
-
-    async function postToDiscordWebhook(webhookUrl, blob){
-      const percentage = Math.round((score/questions.length)*100);
-      const shareText = `I scored ${percentage}% on the Zama FHE Quiz! 🔐✨
-#ZamaCreatorProgram`;
-
-      const form = new FormData();
-      form.append('file', blob, 'result.png');
-      form.append('content', shareText);
-
-      try{
-        const res = await fetch(webhookUrl, {method:'POST', body: form});
-        if (res.ok){
-          alert('Posted to Discord channel via webhook successfully.');
-        } else {
-          const txt = await res.text().catch(()=>res.statusText);
-          alert('Discord webhook returned error: ' + res.status + '
-' + txt + '
-
-If this fails due to CORS, you should either use a small server proxy or upload manually.');
-        }
-      } catch(err){
-        console.error(err);
-        alert('Could not post to Discord webhook from this browser. This is likely due to CORS restrictions.
-
-Fallback: click "Download", then open Discord and upload the image manually.');
-      }
-    }
-
-    function downloadImage(){
-      const canvas = document.getElementById('resultCanvas');
-      const link = document.createElement('a');
-      link.download = 'zama-quiz-result.png';
-      link.href = canvas.toDataURL('image/png');
+    function downloadImage() {
+      const canvas = document.getElementById("canvas");
+      const link = document.createElement("a");
+      link.download = "zama-quiz-result.png";
+      link.href = canvas.toDataURL();
       link.click();
     }
-
-    // accessibility
-    startBtn.addEventListener('keyup',(e)=>{ if (e.key === 'Enter') startBtn.click(); });
   </script>
 </body>
 </html>
