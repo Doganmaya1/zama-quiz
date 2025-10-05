@@ -6,81 +6,79 @@
   <title>Zama Quiz — 10 Questions</title>
   <style>
     :root{
-      --bg:#071522;        /* dark page background */
-      --panel:#0b1622;
+      --bg-dark:#061018; /* page background */
+      --panel:#071522;
       --accent-yellow:#ffd700; /* vivid yellow */
-      --soft-yellow:#fff6d6;   /* pale yellow for hovers */
+      --soft-yellow:#fff8dc;   /* pale yellow */
       --white:#ffffff;
       --black:#000000;
     }
     *{box-sizing:border-box}
     body{
       margin:0;
-      font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-      background: linear-gradient(180deg,#061019 0%, #071522 100%);
+      font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
+      background:linear-gradient(180deg,var(--bg-dark), #071622);
       color:var(--white);
       -webkit-font-smoothing:antialiased;
       text-align:center;
-      padding:32px 16px 64px;
+      padding:36px 18px 72px;
     }
-    h1{
-      margin:18px 0 6px;
-      color:var(--accent-yellow);
-      letter-spacing:0.4px;
-      font-weight:700;
-      font-size:28px;
-    }
-    #intro{max-width:820px;margin:18px auto;background:rgba(255,255,255,0.03);padding:22px;border-radius:12px}
-    #intro p{margin:10px 0;color:rgba(255,255,255,0.85);font-size:15px}
 
+    h1{
+      margin:8px 0 6px;
+      color:var(--accent-yellow);
+      font-weight:800;
+      font-size:28px;
+      letter-spacing:0.3px;
+    }
+
+    /* INTRO */
+    #intro{max-width:820px;margin:18px auto;background:rgba(255,255,255,0.02);padding:22px;border-radius:12px}
+    #intro p{margin:6px 0;color:var(--white);font-size:16px}
     .start-btn{
       background:var(--accent-yellow);
       color:var(--black);
       border:none;
       padding:12px 20px;
-      font-weight:700;
+      font-weight:800;
       font-size:15px;
       border-radius:10px;
       cursor:pointer;
-      box-shadow:0 6px 18px rgba(0,0,0,0.4);
+      box-shadow:0 8px 20px rgba(0,0,0,0.45);
     }
-    .start-btn:hover{filter:brightness(.98)}
+    .start-btn:hover{filter:brightness(.95)}
 
-    #quiz{display:none;max-width:900px;margin:24px auto;padding:18px;border-radius:12px;background:rgba(255,255,255,0.02)}
+    /* QUIZ */
+    #quiz{display:none;max-width:920px;margin:26px auto;padding:18px;border-radius:12px;background:rgba(255,255,255,0.02)}
     .meta-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px}
 
-    /* Timer badge */
-    .timer-badge{
-      display:inline-flex;align-items:center;gap:12px;padding:8px 12px;border-radius:999px;background:var(--black);color:var(--accent-yellow);font-weight:800;font-size:16px;
-      box-shadow:0 6px 12px rgba(0,0,0,0.6);
-    }
-    .timer-bar-outer{width:260px;background:rgba(255,255,255,0.08);height:12px;border-radius:999px;overflow:hidden}
+    /* Timer badge (black background, yellow text) */
+    .timer-badge{display:inline-flex;align-items:center;gap:10px;padding:8px 12px;border-radius:999px;background:var(--black);color:var(--accent-yellow);font-weight:900;font-size:16px}
+    .timer-bar-outer{width:300px;background:rgba(255,255,255,0.06);height:12px;border-radius:999px;overflow:hidden}
     .timer-bar-inner{height:100%;width:100%;background:linear-gradient(90deg,var(--accent-yellow), #ffd84a);transition:width 0.25s linear}
 
     .question-box{background:rgba(255,255,255,0.02);padding:18px;border-radius:12px;text-align:left}
-    .qnum{color:var(--soft-yellow);font-weight:700;margin-bottom:6px}
-    .qtext{font-size:18px;margin:0 0 14px;color:var(--white)}
+    .qnum{color:var(--soft-yellow);font-weight:800;margin-bottom:6px}
+    .qtext{font-size:20px;margin:0 0 14px;color:var(--white);font-weight:800} /* bold question */
 
-    .options{display:flex;flex-direction:column;gap:10px}
-    .option-btn{
-      display:flex;align-items:center;gap:12px;background:var(--white);color:var(--black);border:none;padding:12px 14px;border-radius:10px;text-align:left;font-weight:700;cursor:pointer;font-size:15px;box-shadow:0 6px 12px rgba(0,0,0,0.15);
-    }
-    .option-btn .letter{width:36px;height:36px;border-radius:50%;background:var(--black);color:var(--white);display:inline-flex;align-items:center;justify-content:center;font-weight:800}
+    .options{display:flex;flex-direction:column;gap:12px}
+    .option-btn{display:flex;align-items:center;gap:12px;background:var(--white);color:var(--black);border:none;padding:12px 14px;border-radius:10px;text-align:left;font-weight:700;cursor:pointer;font-size:15px;box-shadow:0 8px 18px rgba(0,0,0,0.14)}
+    .option-btn .letter{min-width:36px;height:36px;border-radius:50%;background:var(--black);color:var(--white);display:inline-flex;align-items:center;justify-content:center;font-weight:900}
+    .option-btn .label-text{font-weight:700}
     .option-btn:hover{background:var(--soft-yellow)}
-    .option-btn[disabled]{opacity:0.6;cursor:not-allowed}
+    .option-btn[disabled]{opacity:0.65;cursor:not-allowed}
 
+    /* RESULT */
     #result{display:none;margin-top:24px}
     #result h2{margin:8px 0;font-size:20px}
-
     canvas{border-radius:12px;display:block;margin:12px auto;border:4px solid rgba(255,255,255,0.04)}
     .actions{display:flex;gap:12px;justify-content:center;margin-top:12px}
-    .action-btn{background:var(--accent-yellow);color:var(--black);border:none;padding:10px 14px;border-radius:8px;font-weight:700;cursor:pointer}
+    .action-btn{background:var(--accent-yellow);color:var(--black);border:none;padding:10px 14px;border-radius:8px;font-weight:800;cursor:pointer}
 
-    /* Responsive tweaks */
     @media (max-width:640px){
       .timer-bar-outer{width:160px}
+      .qtext{font-size:18px}
       .option-btn{font-size:14px}
-      .qtext{font-size:16px}
     }
   </style>
 </head>
@@ -88,30 +86,23 @@
   <h1>Zama Quiz — 10 Questions</h1>
 
   <div id="intro">
-    <!-- User requested a short, clear English intro. This is the refined version: -->
-    <p><strong>No login, no email — just click "Start Quiz" to begin.</strong></p>
-    <p>You will have <strong>15 seconds</strong> for each question. Once you answer, you move forward and cannot go back.</p>
-    <button class="start-btn" id="startBtn">Start Quiz</button>
-    <p style="font-size:13px;color:rgba(255,255,255,0.65);margin-top:10px">At the end your score will be shown on a Zama image. You can share it on X (Twitter) or download it.</p>
+    <!-- User requested only a single clear English intro line: -->
+    <p><strong>Click "Start" to begin. You have 15 seconds for each question.</strong></p>
+    <div style="margin-top:12px"><button class="start-btn" id="startBtn">Start</button></div>
   </div>
 
   <div id="quiz" aria-live="polite">
     <div class="meta-row">
-      <div id="progressText" style="text-align:left;color:rgba(255,255,255,0.85);font-weight:700">Question 1 / 10</div>
+      <div id="progressText" style="text-align:left;color:var(--white);font-weight:800">Question 1 / 10</div>
       <div style="display:flex;align-items:center;gap:12px">
-        <div class="timer-badge" id="timerBadge">
-          <span id="timerText">15s</span>
-        </div>
-        <div class="timer-bar-outer" aria-hidden="true">
-          <div class="timer-bar-inner" id="timerBar" style="width:100%"></div>
-        </div>
+        <div class="timer-badge" id="timerBadge"><span id="timerText">15s</span></div>
+        <div class="timer-bar-outer" aria-hidden="true"><div class="timer-bar-inner" id="timerBar" style="width:100%"></div></div>
       </div>
     </div>
 
     <div class="question-box">
       <div class="qnum" id="qNum">Question 1</div>
-      <p class="qtext" id="qText">Loading...</p>
-
+      <p class="qtext" id="qText">Loading question…</p>
       <div class="options" id="options"></div>
     </div>
   </div>
@@ -126,7 +117,6 @@
   </div>
 
   <script>
-    // Questions array (English)
     const questions = [
       { q: "What does FHE stand for?", options: ["Fast Homomorphic Encryption","Fully Homomorphic Encryption","Federated Homomorphic Encoding","Fault-tolerant Hash Encryption"], correct: "Fully Homomorphic Encryption"},
       { q: "Which company/project provides the protocol you studied here?", options: ["Zama","ZeroCorp","CryptoChain","Homomorphic Labs"], correct: "Zama"},
@@ -141,14 +131,10 @@
     ];
 
     const LETTERS = ['a','b','c','d'];
-    const QUESTION_TIME = 15; // seconds
+    const QUESTION_TIME = 15;
+    let current = 0; let score = 0; let timer = null; let timeLeft = QUESTION_TIME;
 
-    let current = 0;
-    let score = 0;
-    let timer = null;
-    let timeLeft = QUESTION_TIME;
-
-    // DOM
+    // DOM refs
     const startBtn = document.getElementById('startBtn');
     const quizDiv = document.getElementById('quiz');
     const resultDiv = document.getElementById('result');
@@ -167,7 +153,6 @@
     downloadBtn.addEventListener('click', downloadImage);
 
     function startQuiz(){
-      // reset
       current = 0; score = 0;
       document.getElementById('intro').style.display = 'none';
       resultDiv.style.display = 'none';
@@ -179,21 +164,20 @@
       const q = questions[current];
       progressText.textContent = `Question ${current+1} / ${questions.length}`;
       qNumEl.textContent = `Question ${current+1}`;
-      qTextEl.textContent = `${current+1}. ${q.q}`;
+      qTextEl.textContent = q.q; // bold via CSS
 
-      // build options
       optionsEl.innerHTML = '';
-      q.options.forEach((opt, i) => {
+      q.options.forEach((opt,i) => {
         const btn = document.createElement('button');
         btn.className = 'option-btn';
         btn.type = 'button';
         btn.dataset.index = i;
-        btn.innerHTML = `<span class="letter">${LETTERS[i] || ''}</span><span class="opt-text">${opt}</span>`;
+        // show a - option
+        btn.innerHTML = `<span class="letter">${LETTERS[i]}</span><span class="label-text">${LETTERS[i]} - ${opt}</span>`;
         btn.addEventListener('click', () => answer(i));
         optionsEl.appendChild(btn);
       });
 
-      // start timer
       startTimer();
     }
 
@@ -205,9 +189,8 @@
         timeLeft -= 1;
         if (timeLeft <= 0){
           clearInterval(timer);
-          // disable buttons
           disableOptions();
-          nextQuestion();
+          setTimeout(() => nextQuestion(), 150);
         } else {
           updateTimerUI();
         }
@@ -216,15 +199,8 @@
 
     function updateTimerUI(){
       timerText.textContent = `${timeLeft}s`;
-      const pct = Math.max(0, Math.min(100, (timeLeft / QUESTION_TIME) * 100));
+      const pct = Math.max(0,(timeLeft/QUESTION_TIME)*100);
       timerBar.style.width = `${pct}%`;
-      // change timer colors slightly when low
-      const badge = document.getElementById('timerBadge');
-      if (timeLeft <= 4) {
-        badge.style.boxShadow = '0 8px 18px rgba(255,215,0,0.18)';
-      } else {
-        badge.style.boxShadow = '0 6px 12px rgba(0,0,0,0.4)';
-      }
     }
 
     function disableOptions(){
@@ -233,46 +209,39 @@
     }
 
     function answer(index){
-      // lock and evaluate
       disableOptions();
       clearInterval(timer);
       const selected = questions[current].options[index];
       const correct = questions[current].correct;
-      // visual feedback
+
+      // visual mark: highlight correct option with subtle border
       const buttons = optionsEl.querySelectorAll('button');
       buttons.forEach(btn => {
         const i = Number(btn.dataset.index);
         if (questions[current].options[i] === correct){
-          btn.style.outline = '3px solid rgba(0,0,0,0.6)';
-          btn.style.boxShadow = '0 6px 12px rgba(0,0,0,0.25)';
-        }
-        if (i === index && questions[current].options[i] !== correct){
+          btn.style.boxShadow = '0 10px 24px rgba(255,215,0,0.12)';
+          btn.style.border = '2px solid rgba(255,215,0,0.25)';
+        } else if (i === index && questions[current].options[i] !== correct){
           btn.style.opacity = '0.7';
         }
       });
 
       if (selected === correct) score++;
-
-      // small delay so user perceives selection, then next
       setTimeout(() => nextQuestion(), 300);
     }
 
     function nextQuestion(){
       current++;
-      if (current >= questions.length){
-        showResult();
-      } else {
-        showQuestion();
-      }
+      if (current >= questions.length) showResult();
+      else showQuestion();
     }
 
-    // DRAW RESULT
+    /* RESULT DRAWING: user requested percentage in top-left, black color, a bit large */
     function showResult(){
       quizDiv.style.display = 'none';
       resultDiv.style.display = 'block';
-      const percentage = Math.round((score / questions.length) * 100);
+      const percentage = Math.round((score/questions.length)*100);
       scoreText.textContent = `${percentage}% correct answers`;
-
       drawResultImage(percentage);
     }
 
@@ -293,85 +262,64 @@
     function drawResultImage(percentage){
       const canvas = document.getElementById('resultCanvas');
       const ctx = canvas.getContext('2d');
-      const w = canvas.width;
-      const h = canvas.height;
-
-      // clear
+      const w = canvas.width; const h = canvas.height;
       ctx.clearRect(0,0,w,h);
 
       const img = new Image();
-      img.src = 'zama-image.jpg'; // if you have an image in repo, it will be used
-
+      img.src = 'zama-image.jpg';
       img.onload = () => {
-        // draw image as background
         ctx.drawImage(img,0,0,w,h);
-        drawOverlay(percentage, ctx, w, h);
+        drawTopLeftPercent(ctx,w,h,percentage);
+        drawBottomBar(ctx,w,h,percentage);
       };
-
       img.onerror = () => {
-        // fallback background gradient
+        // fallback gradient
         const g = ctx.createLinearGradient(0,0,w,h);
-        g.addColorStop(0,'#063046');
-        g.addColorStop(1,'#0b1622');
-        ctx.fillStyle = g;
-        ctx.fillRect(0,0,w,h);
-        drawOverlay(percentage, ctx, w, h);
+        g.addColorStop(0,'#0b1b2a'); g.addColorStop(1,'#071522');
+        ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+        drawTopLeftPercent(ctx,w,h,percentage);
+        drawBottomBar(ctx,w,h,percentage);
       };
     }
 
-    function drawOverlay(percentage, ctx, w, h){
-      // draw a semi-transparent band at bottom with info
-      ctx.save();
-      // top-left black box for the large percentage (user requested)
-      const boxX = 24;
-      const boxY = 24;
-      const boxW = 240;
-      const boxH = 120;
-      drawRoundedRect(ctx, boxX, boxY, boxW, boxH, 14);
-      ctx.fillStyle = 'rgba(0,0,0,0.94)';
+    function drawTopLeftPercent(ctx,w,h,percentage){
+      // draw a soft light background to ensure black text is readable
+      const pad = 18; const boxW = 220; const boxH = 110;
+      drawRoundedRect(ctx,pad,pad,boxW,boxH,12);
+      ctx.fillStyle = 'rgba(255,255,255,0.96)';
       ctx.fill();
 
-      // percentage text
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 56px Arial';
+      // draw big black percentage
+      ctx.fillStyle = '#000000';
+      ctx.font = 'bold 64px Arial';
       ctx.textBaseline = 'middle';
-      // center percentage inside the box vertically
-      ctx.fillText(`${percentage}%`, boxX + 20, boxY + boxH/2);
+      ctx.fillText(`${percentage}%`, pad + 18, pad + boxH/2);
+    }
 
-      // small label under percent
-      ctx.font = '600 18px Arial';
-      ctx.fillText('Correct', boxX + 20 + ctx.measureText(`${percentage}%`).width + 12, boxY + boxH/2 - 6);
-
-      // draw a subtle bottom info bar
-      ctx.globalAlpha = 0.88;
+    function drawBottomBar(ctx,w,h,percentage){
+      ctx.save();
+      ctx.globalAlpha = 0.9;
       ctx.fillStyle = 'rgba(0,0,0,0.45)';
-      ctx.fillRect(0, h - 86, w, 86);
+      ctx.fillRect(0,h-86,w,86);
       ctx.globalAlpha = 1;
-
-      // Title / branding
-      ctx.font = '700 28px Arial';
-      ctx.fillStyle = '#ffffff';
-      ctx.fillText('Zama Quiz — FHE Knowledge', 34, h - 44);
-
-      // small help text
-      ctx.font = '16px Arial';
-      ctx.fillStyle = 'rgba(255,255,255,0.85)';
-      ctx.fillText(`Score: ${percentage}% — ${score} / ${questions.length}`, 34, h - 20);
+      ctx.font = '700 28px Arial'; ctx.fillStyle = '#ffffff';
+      ctx.fillText('Zama Quiz — FHE Knowledge', 34, h-44);
+      ctx.font = '16px Arial'; ctx.fillStyle = 'rgba(255,255,255,0.95)';
+      ctx.fillText(`Score: ${percentage}% — ${score} / ${questions.length}`, 34, h-20);
       ctx.restore();
     }
 
-    // Share or download
+    // share / download
     function shareImage(){
       const canvas = document.getElementById('resultCanvas');
       canvas.toBlob(function(blob){
-        const file = new File([blob], 'zama-quiz-result.png', {type:'image/png'});
+        const file = new File([blob],'zama-quiz-result.png',{type:'image/png'});
         const shareText = `I scored ${Math.round((score/questions.length)*100)}% on the Zama FHE Quiz! #ZamaOGNFT`;
         if (navigator.canShare && navigator.canShare({files:[file]})){
           navigator.share({title:'Zama Quiz Result',text:shareText,files:[file]}).catch(err=>console.log('Share failed',err));
         } else {
-          // fallback: download and inform user
           downloadImage();
-          alert('Direct sharing is not supported by this browser. The image was downloaded — upload it to X (Twitter) manually.');
+          alert('Direct sharing is not supported by this browser. The image was downloaded — upload it to X manually.');
         }
       }, 'image/png');
     }
@@ -384,7 +332,7 @@
       link.click();
     }
 
-    // Accessibility: allow Enter to start on focused start button
+    // accessibility: Enter to start
     startBtn.addEventListener('keyup', (e)=>{ if (e.key === 'Enter') startBtn.click(); });
 
   </script>
