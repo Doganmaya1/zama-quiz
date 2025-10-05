@@ -163,6 +163,8 @@
         h1 { font-size: 2rem; }
         .question-text { font-size: 1.2rem; }
         button { width: 100%; padding: 15px; }
+        #timer-bar-container { width: 50%; }
+        #timer-text { font-size: 1rem; }
     }
   </style>
 </head>
@@ -338,7 +340,7 @@
         const cssHeight = rect.width * 0.5;
 
         const img = new Image();
-        img.src = "zama-image.jpg"; // Küçük harf, kök dizin – repo'da aynı olmalı
+        img.src = "zama-image.jpg"; // Keep as is, fallback handles missing image
         img.onload = () => {
             ctx.drawImage(img, 0, 0, cssWidth, cssHeight);
             drawText();
@@ -352,20 +354,23 @@
         function drawText() {
             const percentage = Math.round((score / questions.length) * 100);
             const primaryText = `${percentage}%`;
-            const secondaryText = `You answered ${score}/${questions.length} correctly`;
+            const secondaryText = `FHE Mastery: ${score}/${questions.length}`; // Creative, short alternative placed above
 
             ctx.fillStyle = "white"; // White text for visibility
             ctx.textAlign = "left"; // Align left for top-left placement
             ctx.textBaseline = "top"; // Align top
-            ctx.font = `bold ${cssWidth / 8}px Poppins`;
             ctx.strokeStyle = "black"; // Black stroke for outline
             ctx.lineWidth = cssWidth / 100;
-            ctx.strokeText(primaryText, 20, 20); // Position at top-left (20px padding)
-            ctx.fillText(primaryText, 20, 20);
 
-            ctx.font = `600 ${cssWidth / 25}px Poppins`;
-            ctx.strokeText(secondaryText, 20, 20 + (cssWidth / 8) + 10); // Secondary text right below primary, with spacing
-            ctx.fillText(secondaryText, 20, 20 + (cssWidth / 8) + 10);
+            // Draw secondary (small) text first, above the primary
+            ctx.font = `600 ${cssWidth / 30}px Poppins`; // Made slightly smaller for "small" request
+            ctx.strokeText(secondaryText, 20, 20);
+            ctx.fillText(secondaryText, 20, 20);
+
+            // Draw primary below it
+            ctx.font = `bold ${cssWidth / 8}px Poppins`;
+            ctx.strokeText(primaryText, 20, 20 + (cssWidth / 30) + 15); // Adjusted position with spacing
+            ctx.fillText(primaryText, 20, 20 + (cssWidth / 30) + 15);
         }
     }
 
