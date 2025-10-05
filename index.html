@@ -362,13 +362,13 @@
             ctx.strokeStyle = "black"; // Black stroke for outline
             ctx.lineWidth = cssWidth / 100;
 
-            // Mobil için yazı boyutunu küçült (eğer ekran genişliği < 600px ise %30 küçült)
+            // Mobil için yazı boyutunu küçült (eğer ekran genişliği < 600px ise %40 küçült)
             let secondaryFontSize = cssWidth / 30;
             let primaryFontSize = cssWidth / 8;
             let spacing = 15; // Ekstra boşluk
 
             if (window.innerWidth < 600) {
-                primaryFontSize *= 0.7; // %30 küçült
+                primaryFontSize *= 0.6; // %40 küçült (daha küçük hale getir)
                 secondaryFontSize *= 0.8; // İkincil yazıyı da biraz küçült, opsiyonel
                 spacing = 10; // Mobil için boşluğu azalt, ama üst üste binmeyi önle
             }
