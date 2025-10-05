@@ -170,11 +170,10 @@
     <div id="intro">
       <h1>Zama <span>FHE</span> Quiz</h1>
       <p>
-        Ready to challenge your knowledge of Fully Homomorphic Encryption?
-        You'll face 10 questions, with just <b>15 seconds</b> for each.
-        Prove your expertise and claim your spot among the privacy pioneers!
+        Step into the future of privacy. Test your FHE knowledge against the clock.
+        <b>10 questions, 15 seconds each.</b> Are you ready?
       </p>
-      <button onclick="startQuiz()">Start the Challenge</button>
+      <button id="startButton">Start the Challenge</button>
     </div>
 
     <div id="quiz">
@@ -225,6 +224,7 @@
     const introDiv = document.getElementById("intro");
     const quizDiv = document.getElementById("quiz");
     const resultDiv = document.getElementById("result");
+    const startButton = document.getElementById("startButton");
 
     function startQuiz() {
       introDiv.style.display = "none";
@@ -267,7 +267,6 @@
         const timerBar = document.getElementById("timer-bar");
         timerBar.style.transition = 'none'; // reset transition for instant change
         timerBar.style.width = '100%';
-        // force reflow to apply the change immediately
         void timerBar.offsetWidth; 
         timerBar.style.transition = 'width 1s linear';
     }
@@ -279,7 +278,6 @@
         document.getElementById("timer-bar").style.width = `${(timeLeft / 15) * 100}%`;
         if (timeLeft <= 0) {
           clearInterval(timer);
-          // Mark all as incorrect and move on
           document.querySelectorAll('.option-btn').forEach(btn => {
               btn.disabled = true;
               if(btn.textContent === questions[currentQuestionIndex].correct) {
@@ -300,14 +298,13 @@
         button.classList.add("correct");
       } else {
         button.classList.add("incorrect");
-        // Also show the correct answer
         document.querySelectorAll('.option-btn').forEach(btn => {
           if (btn.textContent === correct) {
             btn.classList.add("correct");
           }
         });
       }
-      setTimeout(nextQuestion, 1500); // Wait 1.5s before next question
+      setTimeout(nextQuestion, 1500);
     }
 
     function nextQuestion() {
@@ -319,7 +316,6 @@
       quizDiv.style.display = "none";
       resultDiv.style.display = "block";
       drawResultCanvas();
-      // Add a resize observer to redraw canvas if window size changes
       new ResizeObserver(drawResultCanvas).observe(document.getElementById('canvas'));
     }
     
@@ -329,23 +325,21 @@
         const dpr = window.devicePixelRatio || 1;
         const rect = canvas.getBoundingClientRect();
 
-        // Set canvas internal size
         canvas.width = rect.width * dpr;
-        canvas.height = (rect.width * 0.5) * dpr; // Use a 2:1 aspect ratio
+        canvas.height = (rect.width * 0.5) * dpr;
         ctx.scale(dpr, dpr);
         
         const cssWidth = rect.width;
         const cssHeight = rect.width * 0.5;
 
-        // Draw background image or fallback color
         const img = new Image();
-        img.src = "zama-bg.jpg"; // USE YOUR BACKGROUND IMAGE HERE
+        img.src = "zama-bg.jpg";
         img.onload = () => {
             ctx.drawImage(img, 0, 0, cssWidth, cssHeight);
             drawText();
         };
         img.onerror = () => {
-            ctx.fillStyle = "#FFD700"; // Zama yellow fallback
+            ctx.fillStyle = "#FFD700";
             ctx.fillRect(0, 0, cssWidth, cssHeight);
             drawText();
         };
@@ -355,7 +349,6 @@
             const primaryText = `${percentage}%`;
             const secondaryText = `You answered ${score}/${questions.length} correctly`;
 
-            // Style and draw primary text (percentage)
             ctx.fillStyle = "white";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
@@ -365,7 +358,6 @@
             ctx.strokeText(primaryText, cssWidth / 2, cssHeight / 2.2);
             ctx.fillText(primaryText, cssWidth / 2, cssHeight / 2.2);
 
-            // Style and draw secondary text
             ctx.font = `600 ${cssWidth / 25}px Poppins`;
             ctx.strokeText(secondaryText, cssWidth / 2, cssHeight / 1.5);
             ctx.fillText(secondaryText, cssWidth / 2, cssHeight / 1.5);
@@ -399,6 +391,11 @@
       link.href = canvas.toDataURL();
       link.click();
     }
+
+    // --- YENİ EKLENEN BUTON BAĞLAMA KODU ---
+    // Bu kod, sayfa yüklendiğinde 'startButton' id'li butonu bulur ve 'startQuiz' fonksiyonunu
+    // bu butonun tıklama olayına bağlar. Bu, en güvenilir yöntemdir.
+    startButton.addEventListener('click', startQuiz);
   </script>
 </body>
 </html>
